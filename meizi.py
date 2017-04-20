@@ -47,7 +47,7 @@ def get_image_detail_website(url):
     #构建图片具体地址的容器
     for i in range(int(image_amount)):
         image_detail_link = '{}/{}'.format(url, i+1)
-        response = requests.get(image_detail_link).content
+        response = requests.get(image_detail_link,timeout = 500).content
         sel = html.fromstring(response)
         image_download_link = sel.xpath("//div[@class='content']/a/img/@src")[0]
         #这里是单张图片的最终下载地址
