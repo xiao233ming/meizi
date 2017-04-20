@@ -2,15 +2,14 @@ import requests
 from lxml import html
 import os
 import time
-#from socket import timeout as socket_timeout
+from socket import timeout as socket_timeout
+
 
 if not os.path.exists('F:ile'):
     os.mkdir('F:/ile')
 
 def sleep_time():
     time.sleep(0.1)
-    
-
 
 def get_page_number(num):
     #构建函数，用来查找该页内所有图片集的详细地址。目前一页包含15组套图，所以应该返回包含15个链接的序列。
@@ -70,7 +69,7 @@ def download_image(image_title,image_detail_websites):
     for i in image_detail_websites:
         filename = '%s%s.jpg'%(image_title,num)
         print('正在下载图片:%s第%s%s张,'%(image_title,num,amount))
-           
+
         #文件保存在工作目录
         #if os.path.exist('F:/ile/'):
 
@@ -79,16 +78,18 @@ def download_image(image_title,image_detail_websites):
             f.write(requests.get(i).content)
 
         num+=1
-                
+
 if __name__ == '__main__':
     page_number = input('请输入需要爬起的页码:')
-    for link in get_page_number(page_number):
-    
+
+    try:
+        for link in get_page_number(page_number):
             download_image(get_image_title(link),get_image_detail_website(link))
-            time.sleep(0.1)
-        #except socket_timeout:
-            #print("连接超时了，休息一下...")
-            #time.sleep(random.randint(15,25))
+            #time.sleep(0.1)
+    except socket_timeout:
+            print("连接超时了，休息一下...")
+            time.sleep(random.randint(15,25))
+
 print('下载完毕')
 
 #任务抓取失败，尝试多几次
