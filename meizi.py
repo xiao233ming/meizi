@@ -1,8 +1,16 @@
 import requests
 from lxml import html
 import os
+import time
+#from socket import timeout as socket_timeout
 
-os.mkdir('F:/ile')
+if not os.path.exists('F:ile'):
+    os.mkdir('F:/ile')
+
+def sleep_time():
+    time.sleep(0.1)
+    
+
 
 def get_page_number(num):
     #构建函数，用来查找该页内所有图片集的详细地址。目前一页包含15组套图，所以应该返回包含15个链接的序列。
@@ -22,12 +30,12 @@ def get_page_number(num):
     #将序列作为函数结果返回
 
 def get_image_title(url):
-	#现在进入套图详细页面，把套图标题和图片总数提取出来
-	response = requests.get(url).content
-	selector = html.fromstring(response)
-	image_title = selector.xpath("//h2/text()")[0]
-	#xpath返回结果都是序列，所以要使用[0]进行定位
-	return image_title
+    #现在进入套图详细页面，把套图标题和图片总数提取出来
+    response = requests.get(url).content
+    selector = html.fromstring(response)
+    image_title = selector.xpath("//h2/text()")[0]
+    #xpath返回结果都是序列，所以要使用[0]进行定位
+    return image_title
 
 def get_image_amount(url):
     #这里就相当于重复造轮子了，因为基本的代码逻辑跟上一个函数一模一样。想要简单的话就是定义一个元组，然后把获取标题、获取链接、获取图片总数的3组函数的逻辑揉在一起，最后将结果作为元组输出。不过作为新手教程，还是以简单易懂为好吧。想挑战的同学可以试试写元组模式
@@ -55,27 +63,34 @@ def get_image_detail_website(url):
     return image_detail_websites
 
 def download_image(image_title,image_detail_websites):
-    	#将图片保存在本地
+        #将图片保存在本地
     num = 1
     amount = len(image_detail_websites)
-    	#获取图片总数
+        #获取图片总数
     for i in image_detail_websites:
-    	filename = '%s%s.jpg'%(image_title,num)
-    	print('正在下载图片:%s第%s%s张,'%(image_title,num,amount))
+        filename = '%s%s.jpg'%(image_title,num)
+        print('正在下载图片:%s第%s%s张,'%(image_title,num,amount))
            
         #文件保存在工作目录
         #if os.path.exist('F:/ile/'):
 
-    	with open('F:/ile/'+filename,'wb') as f:
-    		f.write(requests.get(i).content)
-    	num+=1
-        
-        
 
+        with open('F:/ile/'+filename,'wb') as f:
+            f.write(requests.get(i).content)
 
+        num+=1
+                
 if __name__ == '__main__':
+    page_number = input('请输入需要爬起的页码:')
+    for link in get_page_number(page_number):
+    
+            download_image(get_image_title(link),get_image_detail_website(link))
+            time.sleep(0.1)
+        #except socket_timeout:
+            #print("连接超时了，休息一下...")
+            #time.sleep(random.randint(15,25))
+print('下载完毕')
 
-	page_number = input('请输入需要爬起的页码:')
-	for link in get_page_number(page_number):
-		download_image(get_image_title(link),get_image_detail_website(link))
-
+#任务抓取失败，尝试多几次
+#自定义写入日志
+#不断新建文件夹自动爬取
